@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tip_calculator_app/providers/ThemeProvider.dart';
 import 'package:tip_calculator_app/providers/TipCalculatorModel.dart';
 import 'package:tip_calculator_app/widgets/bill_amount_field.dart';
 import 'package:tip_calculator_app/widgets/person_counter.dart';
+import 'package:tip_calculator_app/widgets/themeToggler.dart';
 import 'package:tip_calculator_app/widgets/tip_row.dart';
 import 'package:tip_calculator_app/widgets/tip_slider.dart';
 import 'package:tip_calculator_app/widgets/total_per_person.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: ( context) => Tipcalculatormodel(),
-    child: const MyApp()));
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: ( context) => Tipcalculatormodel()),
+      ChangeNotifierProvider(create: (context)=> ThemeProvider())
+      ],
+      child: const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -19,12 +25,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'UTip App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: themeProvider.currentTheme,
+      // theme: ThemeData(
+      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      //   useMaterial3: true,
+      // ),
       home: const UTip(),
     );
   }
@@ -43,12 +51,21 @@ class _UTipState extends State<UTip> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     final model = Provider.of<Tipcalculatormodel>(context);
+    
     // Add style
+
     final style = theme.textTheme.titleMedium!.copyWith(
         color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold);
     return Scaffold(
       appBar: AppBar(
         title: const Text('UTip'),
+        actions: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 20),
+            child: ThemeToggleButton(),
+          )
+        ],
+        
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -104,3 +121,5 @@ class _UTipState extends State<UTip> {
     );
   }
 }
+
+
